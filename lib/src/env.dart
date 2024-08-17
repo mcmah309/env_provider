@@ -26,14 +26,45 @@ class Env {
   /// Joins a collection of Paths appropriately for the PATH environment variable.
   static String joinPaths(Iterable<String> paths) => paths.join(":");
 
-  /// Get the value of an environment variable.
-  static Result<String, EnvVarNotPresent> variable(String envVar) {
-    final val = Platform.environment[envVar];
-    if (val == null) {
-      return Err(EnvVarNotPresent(envVar));
+  /// Get the value of an environment variable from either the compilation configuration or the platform environment.
+  /// If defined in both places and not equal a collision error is returned.
+  static Result<String, VarError> variable(String envVar) {
+    final fromCompilationConfig = String.fromEnvironment(envVar);
+    final fromPlatformEnv = Platform.environment[envVar];
+    if (fromCompilationConfig.isNotEmpty && fromPlatformEnv != null) {
+      if (fromCompilationConfig == fromPlatformEnv) {
+        return Ok(fromCompilationConfig);
+      }
+      return Err(Collision(fromConfig: fromCompilationConfig, fromEnv: fromPlatformEnv));
     }
-    return Ok(val);
+    if (fromPlatformEnv != null) {
+      return Ok(fromPlatformEnv);
+    }
+    if (fromCompilationConfig.isNotEmpty) {
+      return Ok(fromCompilationConfig);
+    }
+    return Err(NotPresent(envVar));
   }
+
+  /// Get the value of an environment variable from the compilation configuration.
+  static Result<String, NotPresent> variableCompConfig(String envVar) {
+    final fromCompilationConfig = String.fromEnvironment(envVar);
+    if (fromCompilationConfig.isNotEmpty) {
+      return Ok(fromCompilationConfig);
+    }
+    return Err(NotPresent(envVar));
+  }
+
+  /// Get the value of an environment variable from the platform environment.
+  static Result<String, NotPresent> variablePlatformEnv(String envVar) {
+    final fromPlatformEnv = Platform.environment[envVar];
+    if (fromPlatformEnv != null) {
+      return Ok(fromPlatformEnv);
+    }
+    return Err(NotPresent(envVar));
+  }
+
+  
 
   /// Returns an iterator of (variable, value) pairs of strings, for all the environment variables of the current process.
   @pragma('vm:prefer-inline')
@@ -41,14 +72,12 @@ class Env {
       Platform.environment.entries.map((entry) => (entry.key, entry.value));
 
   @pragma('vm:prefer-inline')
-  static void setCurrentDirectory(String currentDirectory) =>
-      Directory.current = currentDirectory;
+  static void setCurrentDirectory(String currentDirectory) => Directory.current = currentDirectory;
 
   //************************************************************************//
 
   /// Path to a directory where the application may place application-specific cache files.
-  static Future<Result<Directory, DirectoryRetrievalError>>
-      getApplicationCacheDirectory() async {
+  static Future<Result<Directory, DirectoryRetrievalError>> getApplicationCacheDirectory() async {
     try {
       return Ok(await path_provider.getApplicationCacheDirectory());
     } on path_provider.MissingPlatformDirectoryException catch (e) {
@@ -75,8 +104,7 @@ class Env {
   }
 
   /// Path to a directory where the application may place application support files.
-  static Future<Result<Directory, DirectoryRetrievalError>>
-      getApplicationSupportDirectory() async {
+  static Future<Result<Directory, DirectoryRetrievalError>> getApplicationSupportDirectory() async {
     try {
       return Ok(await path_provider.getApplicationSupportDirectory());
     } on path_provider.MissingPlatformDirectoryException catch (e) {
@@ -89,8 +117,7 @@ class Env {
   }
 
   /// Path to the directory where downloaded files can be stored.
-  static Future<Result<Directory, DirectoryRetrievalError>>
-      getDownloadsDirectory() async {
+  static Future<Result<Directory, DirectoryRetrievalError>> getDownloadsDirectory() async {
     try {
       final directory = await path_provider.getDownloadsDirectory();
       if (directory == null) {
@@ -125,12 +152,10 @@ class Env {
   }
 
   /// Paths to directories where application specific data can be stored externally.
-  static Future<Result<List<Directory>?, DirectoryRetrievalError>>
-      getExternalStorageDirectories(
-          {path_provider.StorageDirectory? type}) async {
+  static Future<Result<List<Directory>?, DirectoryRetrievalError>> getExternalStorageDirectories(
+      {path_provider.StorageDirectory? type}) async {
     try {
-      final directory =
-          await path_provider.getExternalStorageDirectories(type: type);
+      final directory = await path_provider.getExternalStorageDirectories(type: type);
       if (directory == null) {
         return const Err(Unknown(DirectoryRetrievalResultInvalid()));
       }
@@ -145,8 +170,7 @@ class Env {
   }
 
   /// Path to a directory where the application may access top level storage.
-  static Future<Result<Directory, DirectoryRetrievalError>>
-      getExternalStorageDirectory() async {
+  static Future<Result<Directory, DirectoryRetrievalError>> getExternalStorageDirectory() async {
     try {
       final directory = await path_provider.getExternalStorageDirectory();
       if (directory == null) {
@@ -163,8 +187,7 @@ class Env {
   }
 
   /// Path to the directory where application can store files that are persistent, backed up, and not visible to the user, such as sqlite.db.
-  static Future<Result<Directory, DirectoryRetrievalError>>
-      getLibraryDirectory() async {
+  static Future<Result<Directory, DirectoryRetrievalError>> getLibraryDirectory() async {
     try {
       return Ok(await path_provider.getLibraryDirectory());
     } on path_provider.MissingPlatformDirectoryException catch (e) {
@@ -177,8 +200,7 @@ class Env {
   }
 
   /// Path to the temporary directory on the device that is not backed up and is suitable for storing caches of downloaded files.
-  static Future<Result<Directory, DirectoryRetrievalError>>
-      getTemporaryDirectory() async {
+  static Future<Result<Directory, DirectoryRetrievalError>> getTemporaryDirectory() async {
     try {
       return Ok(await path_provider.getTemporaryDirectory());
     } on path_provider.MissingPlatformDirectoryException catch (e) {
@@ -193,16 +215,26 @@ class Env {
 
 //************************************************************************//
 
+sealed class VarError {}
+
 /// Error type for when an environment variable is not present.
-final class EnvVarNotPresent {
+final class NotPresent implements VarError {
   final String envVar;
 
-  EnvVarNotPresent(this.envVar);
+  const NotPresent(this.envVar);
 
   @override
   String toString() {
     return "Variable $envVar is not present in the environment.";
   }
+}
+
+/// The Env var is defined in both the compilation config and platform env.
+final class Collision implements VarError {
+  final String fromConfig;
+  final String fromEnv;
+
+  const Collision({required this.fromConfig, required this.fromEnv});
 }
 
 sealed class DirectoryRetrievalError {}
