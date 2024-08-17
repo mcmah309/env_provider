@@ -1,7 +1,7 @@
 name: env_provider
 description: "A new Flutter package project."
-version: 0.0.1
-homepage:
+version: 0.1.0
+repository: https://github.com/mcmah309/env_provider
 
 environment:
   sdk: '>=3.4.3 <4.0.0'
