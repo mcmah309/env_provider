@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:path_provider/path_provider.dart';
+import 'package:path_provider/path_provider.dart' as path_provider;
 import 'package:rust_core/rust_core.dart';
 
 /// Inspection and manipulation of the process’s environment.
@@ -46,42 +46,141 @@ class Env {
   //************************************************************************//
 
   /// Path to a directory where the application may place application-specific cache files.
-  @pragma('vm:prefer-inline')
-  static Future<Directory> getApplicationCacheDirectory() => getApplicationCacheDirectory();
+  static Future<Result<Directory, DirectoryRetrievalError>> getApplicationCacheDirectory() async {
+    try {
+      return Ok(await path_provider.getApplicationCacheDirectory());
+    } on path_provider.MissingPlatformDirectoryException catch (e) {
+      return Err(MissingPlatformDirectory(e));
+    } on UnsupportedError catch (e) {
+      return Err(Unsupported(e));
+    } catch (e) {
+      return Err(Unknown(e));
+    }
+  }
 
   /// Path to a directory where the application may place data that is user-generated, or that cannot otherwise be recreated by your application.
-  @pragma('vm:prefer-inline')
-  static Future<Directory> getApplicationDocumentsDirectory() => getApplicationDocumentsDirectory();
+  static Future<Result<Directory, DirectoryRetrievalError>> getApplicationDocumentsDirectory() async {
+    try {
+      return Ok(await path_provider.getApplicationDocumentsDirectory());
+    } on path_provider.MissingPlatformDirectoryException catch (e) {
+      return Err(MissingPlatformDirectory(e));
+    } on UnsupportedError catch (e) {
+      return Err(Unsupported(e));
+    } catch (e) {
+      return Err(Unknown(e));
+    }
+  }
 
   /// Path to a directory where the application may place application support files.
-  @pragma('vm:prefer-inline')
-  static Future<Directory> getApplicationSupportDirectory() => getApplicationSupportDirectory();
+  static Future<Result<Directory, DirectoryRetrievalError>> getApplicationSupportDirectory() async {
+    try {
+      return Ok(await path_provider.getApplicationSupportDirectory());
+    } on path_provider.MissingPlatformDirectoryException catch (e) {
+      return Err(MissingPlatformDirectory(e));
+    } on UnsupportedError catch (e) {
+      return Err(Unsupported(e));
+    } catch (e) {
+      return Err(Unknown(e));
+    }
+  }
 
   /// Path to the directory where downloaded files can be stored.
-  @pragma('vm:prefer-inline')
-  static Future<Directory?> getDownloadsDirectory() => getApplicationSupportDirectory();
+  static Future<Result<Directory, DirectoryRetrievalError>> getDownloadsDirectory() async {
+    try {
+      final directory = await path_provider.getDownloadsDirectory();
+      if (directory == null) {
+        return const Err(Unknown(DirectoryRetrievalResultInvalid()));
+      }
+      return Ok(directory);
+    } on path_provider.MissingPlatformDirectoryException catch (e) {
+      return Err(MissingPlatformDirectory(e));
+    } on UnsupportedError catch (e) {
+      return Err(Unsupported(e));
+    } catch (e) {
+      return Err(Unknown(e));
+    }
+  }
 
   /// Paths to directories where application specific cache data can be stored externally.
-  @pragma('vm:prefer-inline')
-  static Future<List<Directory>?> getExternalCacheDirectories() => getExternalCacheDirectories();
+  static Future<Result<List<Directory>?, DirectoryRetrievalError>> getExternalCacheDirectories() async {
+    try {
+      final directory = await path_provider.getExternalCacheDirectories();
+      if (directory == null) {
+        return const Err(Unknown(DirectoryRetrievalResultInvalid()));
+      }
+      return Ok(directory);
+    } on path_provider.MissingPlatformDirectoryException catch (e) {
+      return Err(MissingPlatformDirectory(e));
+    } on UnsupportedError catch (e) {
+      return Err(Unsupported(e));
+    } catch (e) {
+      return Err(Unknown(e));
+    }
+  }
 
   /// Paths to directories where application specific data can be stored externally.
-  @pragma('vm:prefer-inline')
-  static Future<List<Directory>?> getExternalStorageDirectories({StorageDirectory? type}) => getExternalStorageDirectories(type: type);
+  static Future<Result<List<Directory>?, DirectoryRetrievalError>> getExternalStorageDirectories(
+      {path_provider.StorageDirectory? type}) async {
+    try {
+      final directory = await path_provider.getExternalStorageDirectories(type: type);
+      if (directory == null) {
+        return const Err(Unknown(DirectoryRetrievalResultInvalid()));
+      }
+      return Ok(directory);
+    } on path_provider.MissingPlatformDirectoryException catch (e) {
+      return Err(MissingPlatformDirectory(e));
+    } on UnsupportedError catch (e) {
+      return Err(Unsupported(e));
+    } catch (e) {
+      return Err(Unknown(e));
+    }
+  }
 
   /// Path to a directory where the application may access top level storage.
-  @pragma('vm:prefer-inline')
-  static Future<Directory?> getExternalStorageDirectory() => getExternalStorageDirectory();
+  static Future<Result<Directory, DirectoryRetrievalError>> getExternalStorageDirectory() async {
+    try {
+      final directory = await path_provider.getExternalStorageDirectory();
+      if (directory == null) {
+        return const Err(Unknown(DirectoryRetrievalResultInvalid()));
+      }
+      return Ok(directory);
+    } on path_provider.MissingPlatformDirectoryException catch (e) {
+      return Err(MissingPlatformDirectory(e));
+    } on UnsupportedError catch (e) {
+      return Err(Unsupported(e));
+    } catch (e) {
+      return Err(Unknown(e));
+    }
+  }
 
   /// Path to the directory where application can store files that are persistent, backed up, and not visible to the user, such as sqlite.db.
-  @pragma('vm:prefer-inline')
-  static Future<Directory> getLibraryDirectory() => getLibraryDirectory();
+  static Future<Result<Directory, DirectoryRetrievalError>> getLibraryDirectory() async {
+    try {
+      return Ok(await path_provider.getLibraryDirectory());
+    } on path_provider.MissingPlatformDirectoryException catch (e) {
+      return Err(MissingPlatformDirectory(e));
+    } on UnsupportedError catch (e) {
+      return Err(Unsupported(e));
+    } catch (e) {
+      return Err(Unknown(e));
+    }
+  }
 
   /// Path to the temporary directory on the device that is not backed up and is suitable for storing caches of downloaded files.
-  @pragma('vm:prefer-inline')
-  static Future<Directory> getTemporaryDirectory() => getTemporaryDirectory();
-
+  static Future<Result<Directory, DirectoryRetrievalError>> getTemporaryDirectory() async {
+    try {
+      return Ok(await path_provider.getTemporaryDirectory());
+    } on path_provider.MissingPlatformDirectoryException catch (e) {
+      return Err(MissingPlatformDirectory(e));
+    } on UnsupportedError catch (e) {
+      return Err(Unsupported(e));
+    } catch (e) {
+      return Err(Unknown(e));
+    }
+  }
 }
+
+//************************************************************************//
 
 /// Error type for when an environment variable is not present.
 final class EnvVarNotPresent {
@@ -93,4 +192,70 @@ final class EnvVarNotPresent {
   String toString() {
     return "Variable $envVar is not present in the environment.";
   }
+}
+
+sealed class DirectoryRetrievalError {}
+
+final class MissingPlatformDirectory implements DirectoryRetrievalError {
+  final path_provider.MissingPlatformDirectoryException inner;
+
+  const MissingPlatformDirectory(this.inner);
+
+  @override
+  int get hashCode => inner.hashCode;
+
+  @override
+  bool operator ==(Object other) {
+    return other is MissingPlatformDirectory && other.inner == inner;
+  }
+
+  @override
+  String toString() {
+    return inner.toString();
+  }
+}
+
+final class Unsupported implements DirectoryRetrievalError {
+  final UnsupportedError inner;
+
+  const Unsupported(this.inner);
+
+  @override
+  int get hashCode => inner.hashCode;
+
+  @override
+  bool operator ==(Object other) {
+    return other is Unsupported && other.inner == inner;
+  }
+
+  @override
+  String toString() {
+    return inner.toString();
+  }
+}
+
+final class Unknown implements DirectoryRetrievalError {
+  final Object inner;
+
+  const Unknown(this.inner);
+
+  @override
+  int get hashCode => inner.hashCode;
+
+  @override
+  bool operator ==(Object other) {
+    return other is Unknown && other.inner == inner;
+  }
+
+  @override
+  String toString() {
+    return inner.toString();
+  }
+}
+
+//************************************************************************//
+
+/// Usually caused by directory retrieval returning
+class DirectoryRetrievalResultInvalid {
+  const DirectoryRetrievalResultInvalid();
 }
