@@ -1,6 +1,6 @@
 name: env_provider
 description: Env Provider is an all in one utility for interacting with the environment and will never throw and exception.
-version: 0.1.0
+version: 0.2.0
 repository: https://github.com/mcmah309/env_provider
 
 environment:
