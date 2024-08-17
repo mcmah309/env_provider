@@ -1,39 +1,45 @@
-<!--
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
+# Env Provider
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/guides/libraries/writing-package-pages).
-
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-library-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/developing-packages).
--->
-
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
-
-## Features
-
-TODO: List what your package can do. Maybe include images, gifs, or videos.
-
-## Getting started
-
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
+Env Provider is an all in one utility for interacting with the environment and will never throw and exception.
 
 ## Usage
 
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder.
-
+### Platform Directories
+Env Provider is safe super-set of [path_provider](https://pub.dev/packages/path_provider). As such, all
+methods of path_provider can be accessed from `Env`. e.g
 ```dart
-const like = 'sample';
+Result<Directory, DirectoryRetrievalError> docsDir = await Env.getApplicationDocumentsDirectory();
 ```
 
-## Additional information
+### Get Current Directory
 
-TODO: Tell users more about the package: where to find more information, how to
-contribute to the package, how to file issues, what response they can expect
-from the package authors, and more.
+```dart
+String currentDir = Env.currentDirectory();
+```
+
+### Get the Executable Path
+
+```dart
+String exePath = Env.currentExe();
+```
+
+### Get an Environment Variable
+
+```dart
+String? variable = Env.variable('HOME');
+```
+
+### Join Paths
+
+```dart
+String path = Env.joinPaths(['/usr/local/bin', '/usr/bin', '/bin']);
+print(path); // '/usr/local/bin:/usr/bin:/bin'
+```
+
+### List All Environment Variables
+
+```dart
+for (var (variable, value) in Env.variables()) {
+  print('$variable: $value');
+}
+```
