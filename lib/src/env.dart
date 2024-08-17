@@ -29,41 +29,43 @@ class Env {
   /// Get the value of an environment variable from either the compilation configuration or the platform environment.
   /// If defined in both places and not equal a collision error is returned.
   static Result<String, VarError> variable(String envVar) {
-    final fromCompilationConfig = String.fromEnvironment(envVar);
+    //final fromCompilationConfig = String.fromEnvironment(envVar);
     final fromPlatformEnv = Platform.environment[envVar];
-    if (fromCompilationConfig.isNotEmpty && fromPlatformEnv != null) {
-      if (fromCompilationConfig == fromPlatformEnv) {
-        return Ok(fromCompilationConfig);
-      }
-      return Err(Collision(
-          fromConfig: fromCompilationConfig, fromEnv: fromPlatformEnv));
-    }
+    // if (fromCompilationConfig.isNotEmpty && fromPlatformEnv != null) {
+    //   if (fromCompilationConfig == fromPlatformEnv) {
+    //     return Ok(fromCompilationConfig);
+    //   }
+    //   return Err(Collision(
+    //       fromConfig: fromCompilationConfig, fromEnv: fromPlatformEnv));
+    // }
     if (fromPlatformEnv != null) {
       return Ok(fromPlatformEnv);
     }
-    if (fromCompilationConfig.isNotEmpty) {
-      return Ok(fromCompilationConfig);
-    }
+    // if (fromCompilationConfig.isNotEmpty) {
+    //   return Ok(fromCompilationConfig);
+    // }
     return Err(NotPresent(envVar));
   }
 
+  // Does not work since `String.fromEnvironment` needs to be const
   /// Get the value of an environment variable from the compilation configuration.
-  static Result<String, NotPresent> variableCompConfig(String envVar) {
-    final fromCompilationConfig = String.fromEnvironment(envVar);
-    if (fromCompilationConfig.isNotEmpty) {
-      return Ok(fromCompilationConfig);
-    }
-    return Err(NotPresent(envVar));
-  }
+  // static Result<String, NotPresent> variableCompConfig(String envVar) {
+  //   final fromCompilationConfig = String.fromEnvironment(envVar);
+  //   if (fromCompilationConfig.isNotEmpty) {
+  //     return Ok(fromCompilationConfig);
+  //   }
+  //   return Err(NotPresent(envVar));
+  // }
 
+  // Commented out since the above is not working
   /// Get the value of an environment variable from the platform environment.
-  static Result<String, NotPresent> variablePlatformEnv(String envVar) {
-    final fromPlatformEnv = Platform.environment[envVar];
-    if (fromPlatformEnv != null) {
-      return Ok(fromPlatformEnv);
-    }
-    return Err(NotPresent(envVar));
-  }
+  // static Result<String, NotPresent> variablePlatformEnv(String envVar) {
+  //   final fromPlatformEnv = Platform.environment[envVar];
+  //   if (fromPlatformEnv != null) {
+  //     return Ok(fromPlatformEnv);
+  //   }
+  //   return Err(NotPresent(envVar));
+  // }
 
   /// Returns an iterator of (variable, value) pairs of strings, for all the environment variables of the current process.
   @pragma('vm:prefer-inline')
