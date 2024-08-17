@@ -35,7 +35,8 @@ class Env {
       if (fromCompilationConfig == fromPlatformEnv) {
         return Ok(fromCompilationConfig);
       }
-      return Err(Collision(fromConfig: fromCompilationConfig, fromEnv: fromPlatformEnv));
+      return Err(Collision(
+          fromConfig: fromCompilationConfig, fromEnv: fromPlatformEnv));
     }
     if (fromPlatformEnv != null) {
       return Ok(fromPlatformEnv);
@@ -64,20 +65,20 @@ class Env {
     return Err(NotPresent(envVar));
   }
 
-  
-
   /// Returns an iterator of (variable, value) pairs of strings, for all the environment variables of the current process.
   @pragma('vm:prefer-inline')
   static Iterable<(String, String)> variables() =>
       Platform.environment.entries.map((entry) => (entry.key, entry.value));
 
   @pragma('vm:prefer-inline')
-  static void setCurrentDirectory(String currentDirectory) => Directory.current = currentDirectory;
+  static void setCurrentDirectory(String currentDirectory) =>
+      Directory.current = currentDirectory;
 
   //************************************************************************//
 
   /// Path to a directory where the application may place application-specific cache files.
-  static Future<Result<Directory, DirectoryRetrievalError>> getApplicationCacheDirectory() async {
+  static Future<Result<Directory, DirectoryRetrievalError>>
+      getApplicationCacheDirectory() async {
     try {
       return Ok(await path_provider.getApplicationCacheDirectory());
     } on path_provider.MissingPlatformDirectoryException catch (e) {
@@ -104,7 +105,8 @@ class Env {
   }
 
   /// Path to a directory where the application may place application support files.
-  static Future<Result<Directory, DirectoryRetrievalError>> getApplicationSupportDirectory() async {
+  static Future<Result<Directory, DirectoryRetrievalError>>
+      getApplicationSupportDirectory() async {
     try {
       return Ok(await path_provider.getApplicationSupportDirectory());
     } on path_provider.MissingPlatformDirectoryException catch (e) {
@@ -117,7 +119,8 @@ class Env {
   }
 
   /// Path to the directory where downloaded files can be stored.
-  static Future<Result<Directory, DirectoryRetrievalError>> getDownloadsDirectory() async {
+  static Future<Result<Directory, DirectoryRetrievalError>>
+      getDownloadsDirectory() async {
     try {
       final directory = await path_provider.getDownloadsDirectory();
       if (directory == null) {
@@ -152,10 +155,12 @@ class Env {
   }
 
   /// Paths to directories where application specific data can be stored externally.
-  static Future<Result<List<Directory>?, DirectoryRetrievalError>> getExternalStorageDirectories(
-      {path_provider.StorageDirectory? type}) async {
+  static Future<Result<List<Directory>?, DirectoryRetrievalError>>
+      getExternalStorageDirectories(
+          {path_provider.StorageDirectory? type}) async {
     try {
-      final directory = await path_provider.getExternalStorageDirectories(type: type);
+      final directory =
+          await path_provider.getExternalStorageDirectories(type: type);
       if (directory == null) {
         return const Err(Unknown(DirectoryRetrievalResultInvalid()));
       }
@@ -170,7 +175,8 @@ class Env {
   }
 
   /// Path to a directory where the application may access top level storage.
-  static Future<Result<Directory, DirectoryRetrievalError>> getExternalStorageDirectory() async {
+  static Future<Result<Directory, DirectoryRetrievalError>>
+      getExternalStorageDirectory() async {
     try {
       final directory = await path_provider.getExternalStorageDirectory();
       if (directory == null) {
@@ -187,7 +193,8 @@ class Env {
   }
 
   /// Path to the directory where application can store files that are persistent, backed up, and not visible to the user, such as sqlite.db.
-  static Future<Result<Directory, DirectoryRetrievalError>> getLibraryDirectory() async {
+  static Future<Result<Directory, DirectoryRetrievalError>>
+      getLibraryDirectory() async {
     try {
       return Ok(await path_provider.getLibraryDirectory());
     } on path_provider.MissingPlatformDirectoryException catch (e) {
@@ -200,7 +207,8 @@ class Env {
   }
 
   /// Path to the temporary directory on the device that is not backed up and is suitable for storing caches of downloaded files.
-  static Future<Result<Directory, DirectoryRetrievalError>> getTemporaryDirectory() async {
+  static Future<Result<Directory, DirectoryRetrievalError>>
+      getTemporaryDirectory() async {
     try {
       return Ok(await path_provider.getTemporaryDirectory());
     } on path_provider.MissingPlatformDirectoryException catch (e) {
